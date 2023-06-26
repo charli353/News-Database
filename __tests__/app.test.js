@@ -57,15 +57,15 @@ describe("CORE: GET - /api/articles/:article_id", () => {
         .expect(200)
         .then(({ body }) => {
           expect(body.articles.length).not.toBe(0)
-          body.articles.forEach((obj) => {
-            expect(obj).toHaveProperty("article_id", expect.any(Number));
-            expect(obj).toHaveProperty("title", expect.any(String)); 
-            expect(obj).toHaveProperty("topic", expect.any(String)); 
-            expect(obj).toHaveProperty("author", expect.any(String)); 
-            expect(obj).toHaveProperty("body", expect.any(String)); 
-            expect(obj).toHaveProperty("created_at", expect.any(String)); 
-            expect(obj).toHaveProperty("votes", expect.any(Number)); 
-            expect(obj).toHaveProperty("article_img_url", expect.any(String)); 
+          body.articles.forEach((article) => {
+            expect(article).toHaveProperty("article_id", expect.any(Number));
+            expect(article).toHaveProperty("title", expect.any(String)); 
+            expect(article).toHaveProperty("topic", expect.any(String)); 
+            expect(article).toHaveProperty("author", expect.any(String)); 
+            expect(article).toHaveProperty("body", expect.any(String)); 
+            expect(article).toHaveProperty("created_at", expect.any(String)); 
+            expect(article).toHaveProperty("votes", expect.any(Number)); 
+            expect(article).toHaveProperty("article_img_url", expect.any(String)); 
           });
         });
     });
@@ -83,6 +83,14 @@ describe("CORE: GET - /api/articles/:article_id", () => {
       .expect(400)
       .then(({body}) => {
         expect(body).toEqual({Error: "400, Invalid ID"})
+      })
+    })
+    test('400: valid ID that doesnt exist outputs useful error', () => {
+      return request(app)
+      .get("/api/articles/1000")
+      .expect(400)
+      .then(({body}) => {
+        expect(body).toEqual({"articles" : { Error: 'ID Does Not Exist' }})
       })
     })
   })
