@@ -2,6 +2,9 @@ const request = require('supertest')
 const app = require("../db/app");
 const seed = require('../db/seeds/seed')
 const db = require("../db/connection")
+const endPoints = require('../endpoints.json')
+
+
 
 const devData = require('../db/data/test-data/index');
 
@@ -41,10 +44,7 @@ describe("CORE: GET - /api", () => {
         .get("/api")
         .expect(200)
         .then(({ body }) => {
-            expect(body).toHaveProperty("GET /api", expect.any(Object));
-            expect(body).toHaveProperty("GET /api/topics", expect.any(Object)); 
-            expect(body).toHaveProperty("GET /api/articles", expect.any(Object)); 
-
+          expect(body).toMatchObject(endPoints)
         });
     });
 
