@@ -28,3 +28,17 @@ describe("CORE: GET - /api/topics", () => {
           });
       });
 })
+
+describe("CORE: GET - /api", () => {
+  test("200: Endpoint should contain an object with all endpoints", () => {
+      return request(app)
+        .get("/api")
+        .expect(200)
+        .then(({ body }) => {
+            expect(body).toHaveProperty("GET /api", expect.any(Object));
+            expect(body).toHaveProperty("GET /api/topics", expect.any(Object)); 
+            expect(body).toHaveProperty("GET /api/articles", expect.any(Object)); 
+
+        });
+    });
+})
