@@ -21,10 +21,16 @@ describe("CORE: GET - /api/topics", () => {
           .get("/api/topics")
           .expect(200)
           .then(({ body }) => {
-            body.forEach((obj) => {
+            expect(body.topics.length).not.toBe(0)
+            body.topics.forEach((obj) => {
               expect(obj).toHaveProperty("slug", expect.any(String));
               expect(obj).toHaveProperty("description", expect.any(String)); 
             });
           });
       });
+      test('404: Incorrect url input outputs a useful error', () => {
+        return request(app)
+        .get("/api/fakepath")
+        .expect(404)
+      })
 })
