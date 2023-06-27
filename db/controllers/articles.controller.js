@@ -8,7 +8,7 @@ function getArticleById(req, res, next) {
     retrieveArticlesById(id).then((articles) => {
         let code
             if (Object.keys(articles)[0] === 'Error'){
-                code = 400
+                next
             }
             else {
                 code = 200

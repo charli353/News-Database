@@ -3,6 +3,7 @@ const fs = require('fs/promises')
 
 const { getAllTopics, getEndpoints } = require('../db/controllers/topics.controller')
 const { getArticleById } = require('../db/controllers/articles.controller')
+const e = require('express')
 
 const app = express()
 
@@ -18,6 +19,9 @@ app.use((err, req, res, next) => {
     }
     else if (err.code === '22003'){
         res.status(400).send({Error: "400, Invalid ID"})
+    }
+    else {
+        res.status(400).send({Error : "ID Does Not Exist"})
     }
     next()
 })

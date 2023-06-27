@@ -58,7 +58,7 @@ describe("CORE: GET - /api/articles/:article_id", () => {
         .then(({ body }) => {
           expect(body.articles.length).not.toBe(0)
           body.articles.forEach((article) => {
-            expect(article).toHaveProperty("article_id", expect.any(Number));
+            expect(article).toHaveProperty("article_id", (5));
             expect(article).toHaveProperty("title", expect.any(String)); 
             expect(article).toHaveProperty("topic", expect.any(String)); 
             expect(article).toHaveProperty("author", expect.any(String)); 
@@ -69,7 +69,7 @@ describe("CORE: GET - /api/articles/:article_id", () => {
           });
         });
     });
-    test('400: Incorrect url parameter input outputs a useful error', () => {
+    test('400: Incorrect url parameter input outputs a useful error message', () => {
       return request(app)
       .get("/api/articles/dog")
       .expect(400)
@@ -77,7 +77,7 @@ describe("CORE: GET - /api/articles/:article_id", () => {
         expect(body).toEqual({Error: "400, Bad Request"})
       })
     })
-    test('400: ID outside of data range outputs a useful error', () => {
+    test('400: ID outside of data range outputs a useful error message', () => {
       return request(app)
       .get("/api/articles/8365298364982642")
       .expect(400)
@@ -85,12 +85,12 @@ describe("CORE: GET - /api/articles/:article_id", () => {
         expect(body).toEqual({Error: "400, Invalid ID"})
       })
     })
-    test('400: valid ID that doesnt exist outputs useful error', () => {
+    test('400: valid ID that doesnt exist outputs useful error message', () => {
       return request(app)
       .get("/api/articles/1000")
       .expect(400)
       .then(({body}) => {
-        expect(body).toEqual({"articles" : { Error: 'ID Does Not Exist' }})
+        expect(body).toEqual({ Error: 'ID Does Not Exist' })
       })
     })
   })
