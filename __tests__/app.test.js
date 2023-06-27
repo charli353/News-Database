@@ -49,3 +49,48 @@ describe("CORE: GET - /api", () => {
     });
 
 })
+
+describe("CORE: GET - /api/articles/:article_id", () => {
+  test("200: Endpoint should contain all article objects in with correct ID", () => {
+      return request(app)
+        .get("/api/articles/5")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles.length).not.toBe(0)
+          body.articles.forEach((article) => {
+            expect(article).toHaveProperty("article_id", (5));
+            expect(article).toHaveProperty("title", expect.any(String)); 
+            expect(article).toHaveProperty("topic", expect.any(String)); 
+            expect(article).toHaveProperty("author", expect.any(String)); 
+            expect(article).toHaveProperty("body", expect.any(String)); 
+            expect(article).toHaveProperty("created_at", expect.any(String)); 
+            expect(article).toHaveProperty("votes", expect.any(Number)); 
+            expect(article).toHaveProperty("article_img_url", expect.any(String)); 
+          });
+        });
+    });
+    test('400: Incorrect url parameter input outputs a useful error message', () => {
+      return request(app)
+      .get("/api/articles/dog")
+      .expect(400)
+      .then(({body}) => {
+        expect(body).toEqual({Error: "400, Bad Request"})
+      })
+    })
+    test('400: ID outside of data range outputs a useful error message', () => {
+      return request(app)
+      .get("/api/articles/8365298364982642")
+      .expect(400)
+      .then(({body}) => {
+        expect(body).toEqual({Error: "400, Invalid ID"})
+      })
+    })
+    test('400: valid ID that doesnt exist outputs useful error message', () => {
+      return request(app)
+      .get("/api/articles/1000")
+      .expect(400)
+      .then(({body}) => {
+        expect(body).toEqual({ Error: 'ID Does Not Exist' })
+      })
+    })
+  })
