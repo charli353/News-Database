@@ -3,7 +3,7 @@ const fs = require('fs/promises')
 
 const { getAllTopics, getEndpoints } = require('../db/controllers/topics.controller')
 const { getArticleById, getAllArticles } = require('../db/controllers/articles.controller')
-const e = require('express')
+
 
 const app = express()
 
@@ -13,8 +13,6 @@ app.get("/api", getEndpoints)
 
 app.get("/api/articles/:article_id", getArticleById)
 
-// the articles should be sorted by date in descending order.
-// there should not be a body property present on any of the article objects.
 app.get("/api/articles", getAllArticles)
 
 
@@ -29,10 +27,6 @@ app.use((err, req, res, next) => {
         res.status(404).send({Error : "ID Does Not Exist"})
     }
     next()
-})
-
-app.use((err, req, res, next) => {
-    console.log('nexting')
 })
 
 module.exports = app

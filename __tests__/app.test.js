@@ -3,6 +3,7 @@ const app = require("../db/app");
 const seed = require('../db/seeds/seed')
 const db = require("../db/connection")
 const endPoints = require('../endpoints.json')
+const sorted = require('jest-sorted')
 
 
 
@@ -17,7 +18,13 @@ beforeAll(() => {
     db.end()
   });
 
-
+describe("Invalid URL", () => {
+  test('404: Incorrect url input outputs a useful error', () => {
+    return request(app)
+    .get("/api/fakepath")
+    .expect(404)
+  })
+})
 describe("CORE: GET - /api/topics", () => {
     test("200: Endpoint should contain all topic objects in correct format", () => {
         return request(app)
@@ -31,11 +38,6 @@ describe("CORE: GET - /api/topics", () => {
             });
           });
       });
-      test('404: Incorrect url input outputs a useful error', () => {
-        return request(app)
-        .get("/api/fakepath")
-        .expect(404)
-      })
 })
 
 describe("CORE: GET - /api", () => {
@@ -101,9 +103,9 @@ describe("CORE: GET - /api/articles/:article_id", () => {
           .get("/api/articles")
           .expect(200)
           .then(({ body }) => {
-            expect(body.length).not.toBe(0)
+            expect(body.articles.length).not.toBe(0)
        
-            body.forEach((article) => {
+            body.articles.forEach((article) => {
               expect(article).toHaveProperty("article_id", expect.any(Number));
               expect(article).toHaveProperty("title", expect.any(String)); 
               expect(article).toHaveProperty("topic", expect.any(String)); 
@@ -121,32 +123,11 @@ describe("CORE: GET - /api/articles/:article_id", () => {
           .get("/api/articles")
           .expect(200)
           .then(({ body }) => {
-            expect(body.length).not.toBe(0)
-             
-              const regex = /([TZ\W])/g
-  
-              const dateFormat1 = body[0].created_at.replace(regex, " ")
-              let arrayDate = dateFormat1.split(" ")
-
-              body.forEach((article) => {
-                const currentProperty = article.created_at
-                const dateFormat2 = currentProperty.replace(regex, " ")
-                const currentDate = dateFormat2.split(" ")
-
-                index = 0
-                  currentDate.forEach((num) => {
-                    const formatNum =  Number(num)
-                
-                    expect(formatNum).toBeLessThanOrEqual(Number(arrayDate[index]))
-
-                  })
-                arrayDate = currentDate 
-            })
+            expect(body.articles.length).not.toBe(0)
+            const dates = body.articles.map((article) => {
+              return article.created_at
+            })        
+            expect(dates).toBeSorted({ descending: true })
           });
       });
-      test('404: Incorrect url input outputs a useful error', () => {
-        return request(app)
-        .get("/api/fakepath")
-        .expect(404)
-      })
     })
