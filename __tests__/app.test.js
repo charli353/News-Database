@@ -102,6 +102,7 @@ describe("CORE: GET - /api/articles/:article_id", () => {
           .expect(200)
           .then(({ body }) => {
             expect(body.length).not.toBe(0)
+       
             body.forEach((article) => {
               expect(article).toHaveProperty("article_id", expect.any(Number));
               expect(article).toHaveProperty("title", expect.any(String)); 
@@ -110,7 +111,8 @@ describe("CORE: GET - /api/articles/:article_id", () => {
               expect(article).toHaveProperty("created_at", expect.any(String)); 
               expect(article).not.toHaveProperty("body"); 
               expect(article).toHaveProperty("votes", expect.any(Number)); 
-              expect(article).toHaveProperty("article_img_url", expect.any(String)); 
+              expect(article).toHaveProperty("article_img_url", expect.any(String))
+              expect(article).toHaveProperty("comment_count", expect.any(Number));; 
             });
           });
       });

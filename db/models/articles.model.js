@@ -21,7 +21,7 @@ function retrieveArticlesById(id) {
 }   
 
 function retrieveArticles() {
-        const baseQuery = `SELECT articles.article_id, title, topic, author, created_at, votes, article_img_url, comment_count FROM articles LEFT JOIN comment_to_id ON comment_to_id.article_id = articles.article_id ORDER BY created_at DESC;`
+        const baseQuery = `SELECT articles.article_id, title, topic, author, created_at, votes, article_img_url, comment_count, CASE WHEN comment_count is NULL THEN 0 ELSE comment_count END as comment_count FROM articles LEFT JOIN comment_to_id ON comment_to_id.article_id = articles.article_id ORDER BY created_at DESC;`
         return db.query(baseQuery)
         .then(({rows}) => {
             return rows
