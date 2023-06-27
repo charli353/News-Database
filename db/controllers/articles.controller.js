@@ -20,7 +20,6 @@ function getArticleById(req, res, next) {
 
 function getAllArticles(req, res, next) {
     retrieveArticles().then((articles) => {
-        console.log(articles)
         res.status(200).send({'articles' : articles})
     })
 }
