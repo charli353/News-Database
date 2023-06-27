@@ -10,6 +10,9 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
   return db
     .query(`DROP TABLE IF EXISTS comments;`)
     .then(() => {
+      return db.query(`DROP TABLE IF EXISTS comment_to_id;`)
+    })
+    .then(() => {
       return db.query(`DROP TABLE IF EXISTS articles;`);
     })
     .then(() => {
@@ -57,6 +60,12 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
         votes INT DEFAULT 0 NOT NULL,
         created_at TIMESTAMP DEFAULT NOW()
       );`);
+    })
+    .then(() => {
+      return db.query(`CREATE TABLE comment_to_id (
+        article_id INT REFERENCES articles(article_id) NOT NULL,
+        comment_count INT
+        );`)
     })
     .then(() => {
       const insertTopicsQueryStr = format(
@@ -113,7 +122,29 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
         )
       );
       return db.query(insertCommentsQueryStr);
-    });
+    })
+    .then(() => {
+      const obj = {}
+      const formatData = commentData.map((comment) => {
+        if (obj[comment.article_id] === undefined){
+          obj[comment.article_id] = 1
+        }
+        else {
+          obj[comment.article_id]++
+        }
+      })
+      const result = []
+      for(const property in obj){
+        result.push([property, obj[property]])
+      }
+      const junctionData = result
+
+      const queryStr = format(`INSERT INTO comment_to_id (article_id, comment_count) VALUES %L`,
+      junctionData
+      )
+        return db.query(queryStr)
+    })
+    
 };
 
 module.exports = seed;

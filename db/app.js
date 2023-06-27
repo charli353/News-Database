@@ -2,7 +2,7 @@ const express = require('express')
 const fs = require('fs/promises')
 
 const { getAllTopics, getEndpoints } = require('../db/controllers/topics.controller')
-const { getArticleById } = require('../db/controllers/articles.controller')
+const { getArticleById, getAllArticles } = require('../db/controllers/articles.controller')
 const e = require('express')
 
 const app = express()
@@ -13,6 +13,11 @@ app.get("/api", getEndpoints)
 
 app.get("/api/articles/:article_id", getArticleById)
 
+// the articles should be sorted by date in descending order.
+// there should not be a body property present on any of the article objects.
+app.get("/api/articles", getAllArticles)
+
+
 app.use((err, req, res, next) => {
     if (err.code === '22P02'){
         res.status(400).send({Error: "400, Bad Request"})
@@ -21,9 +26,13 @@ app.use((err, req, res, next) => {
         res.status(400).send({Error: "400, Invalid ID"})
     }
     else {
-        res.status(400).send({Error : "ID Does Not Exist"})
+        res.status(404).send({Error : "ID Does Not Exist"})
     }
     next()
+})
+
+app.use((err, req, res, next) => {
+    console.log('nexting')
 })
 
 module.exports = app
