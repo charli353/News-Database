@@ -15,4 +15,13 @@ function retrieveArticlesById(id) {
         
     })
 }   
-module.exports = { retrieveArticlesById }
+
+function retrieveRelevantComments(id) {
+    const values = [id]
+    return db.query(`SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC;`, values)
+        .then(({rows}) => {
+            // console.log(rows)
+            return rows
+        })
+}
+module.exports = { retrieveArticlesById, retrieveRelevantComments }

@@ -3,7 +3,7 @@ const app = require("../db/app");
 const seed = require('../db/seeds/seed')
 const db = require("../db/connection")
 const endPoints = require('../endpoints.json')
-
+const sort = require('jest-sorted')
 
 
 const devData = require('../db/data/test-data/index');
@@ -94,3 +94,33 @@ describe("CORE: GET - /api/articles/:article_id", () => {
       })
     })
   })
+
+
+  describe("CORE: GET /api/articles/:comment_id/comments", () => {
+    test("200: Endpoint should contain all comments about specific article", () => {
+      return request(app)
+        .get("/api/articles/1/comments")
+        .expect(200)
+        .then(({ body }) => {
+          console.log(body)
+          body.forEach((comment) => {
+            expect(comment).toHaveProperty("comment_id", expect.any(Number));
+            expect(comment).toHaveProperty("votes", expect.any(Number)); 
+            expect(comment).toHaveProperty("created_at", expect.any(String)); 
+            expect(comment).toHaveProperty("author", expect.any(String)); 
+            expect(comment).toHaveProperty("body", expect.any(String)); 
+            expect(comment).toHaveProperty("article_id", (1)); 
+          });
+        });
+    });
+    test("200: Endpoint should be ordered by creation date (descending)", () => {
+      return request(app)
+        .get("/api/articles/1/comments")
+        .expect(200)
+        .then(({ body }) => {
+          
+          expect(body).toBeSortedBy('created_at', {descending : true})
+          });
+        });
+        //write error case for 0 results : 404
+    });

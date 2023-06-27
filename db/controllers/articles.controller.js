@@ -1,5 +1,5 @@
-const { error } = require('console')
-const { retrieveArticlesById } = require('../models/articles.model')
+
+const { retrieveArticlesById, retrieveRelevantComments } = require('../models/articles.model')
 
 
 function getArticleById(req, res, next) {
@@ -16,8 +16,16 @@ function getArticleById(req, res, next) {
         res.status(code).send({articles})
     })
     .catch(next)
-
-
 }
 
-module.exports = { getArticleById }
+function getCommentByArticleId(req, res, next) {
+    
+    const id = req.params.article_id
+
+        retrieveRelevantComments(id).then((comments) => {
+            res.status(200).send(comments)
+            console.log(comments)
+        })
+}
+
+module.exports = { getArticleById, getCommentByArticleId }
