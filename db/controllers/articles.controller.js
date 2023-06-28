@@ -1,5 +1,5 @@
 
-const { retrieveArticlesById, retrieveRelevantComments } = require('../models/articles.model')
+const { retrieveArticlesById, retrieveRelevantComments, retrieveArticles } = require('../models/articles.model')
 
 
 function getArticleById(req, res, next) {
@@ -18,14 +18,19 @@ function getArticleById(req, res, next) {
     .catch(next)
 }
 
+function getAllArticles(req, res, next) {
+    retrieveArticles().then((articles) => {
+        res.status(200).send({'articles' : articles})
+    })
+}
+
 function getCommentByArticleId(req, res, next) {
     
     const id = req.params.article_id
 
         retrieveRelevantComments(id).then((comments) => {
             res.status(200).send(comments)
-            console.log(comments)
         })
 }
 
-module.exports = { getArticleById, getCommentByArticleId }
+module.exports = { getArticleById, getCommentByArticleId, getAllArticles }
