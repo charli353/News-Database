@@ -2,6 +2,7 @@
 const { retrieveArticlesById, retrieveRelevantComments, retrieveArticles } = require('../models/articles.model')
 
 
+
 function getArticleById(req, res, next) {
     const id = req.params.article_id
 
@@ -29,8 +30,16 @@ function getCommentByArticleId(req, res, next) {
     const id = req.params.article_id
 
         retrieveRelevantComments(id).then((comments) => {
-            res.status(200).send(comments)
+            let code
+            if (Object.keys(comments)[0] === 'Error'){
+                next
+            }
+            else {
+                code = 200
+            }
+            res.status(code).send(comments)
         })
+        .catch(next)
 }
 
 module.exports = { getArticleById, getCommentByArticleId, getAllArticles }

@@ -20,7 +20,8 @@ function retrieveRelevantComments(id) {
     const values = [id]
     return db.query(`SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC;`, values)
         .then(({rows}) => {
-            return rows
+            return idCheck(rows)
+
         })
 }
 

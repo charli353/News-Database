@@ -119,11 +119,17 @@ describe("CORE: GET - /api/articles/:article_id", () => {
         .get("/api/articles/1/comments")
         .expect(200)
         .then(({ body }) => {
-          
           expect(body).toBeSortedBy('created_at', {descending : true})
           });
         });
-        //write error case for 0 results : 404
+        test('400: valid ID that doesnt exist outputs useful error message', () => {
+          return request(app)
+          .get("/api/articles/120/comments")
+          .expect(404)
+          .then(({body}) => {
+            expect(body).toEqual({ Error: 'ID Does Not Exist' })
+          })
+        })
     });
 
 
