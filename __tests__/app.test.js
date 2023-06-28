@@ -104,7 +104,7 @@ describe("CORE: GET - /api/articles/:article_id", () => {
         .get("/api/articles/1/comments")
         .expect(200)
         .then(({ body }) => {
-          body.forEach((comment) => {
+          body.comments.forEach((comment) => {
             expect(comment).toHaveProperty("comment_id", expect.any(Number));
             expect(comment).toHaveProperty("votes", expect.any(Number)); 
             expect(comment).toHaveProperty("created_at", expect.any(String)); 
@@ -119,10 +119,10 @@ describe("CORE: GET - /api/articles/:article_id", () => {
         .get("/api/articles/1/comments")
         .expect(200)
         .then(({ body }) => {
-          expect(body).toBeSortedBy('created_at', {descending : true})
+          expect(body.comments).toBeSortedBy('created_at', {descending : true})
           });
         });
-        test('400: valid ID that doesnt exist outputs useful error message', () => {
+        test('404: valid ID that doesnt exist outputs useful error message', () => {
           return request(app)
           .get("/api/articles/120/comments")
           .expect(404)
@@ -130,8 +130,23 @@ describe("CORE: GET - /api/articles/:article_id", () => {
             expect(body).toEqual({ Error: 'ID Does Not Exist' })
           })
         })
-    });
-
+        test('400: Incorrect url parameter input outputs a useful error message', () => {
+          return request(app)
+          .get("/api/articles/dog/comments")
+          .expect(400)
+          .then(({body}) => {
+            expect(body).toEqual({Error: "400, Bad Request"})
+          })
+    })
+    test('200: ID with no comments returns empty array.', () => {
+      return request(app)
+      .get("/api/articles/4/comments")
+      .expect(200)
+      .then(({body}) => {
+        expect(body.comments).toEqual({comments: []})
+      })
+  })
+})
 
   describe("CORE: GET - /api/articles", () => {
     test("200: Endpoint should contain all article objects except body", () => {
@@ -167,3 +182,4 @@ describe("CORE: GET - /api/articles/:article_id", () => {
           });
       });
     })
+ 

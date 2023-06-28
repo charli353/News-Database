@@ -30,6 +30,7 @@ function getCommentByArticleId(req, res, next) {
     const id = req.params.article_id
 
         retrieveRelevantComments(id).then((comments) => {
+   
             let code
             if (Object.keys(comments)[0] === 'Error'){
                 next
@@ -37,7 +38,7 @@ function getCommentByArticleId(req, res, next) {
             else {
                 code = 200
             }
-            res.status(code).send(comments)
+            res.status(code).send({'comments': comments})
         })
         .catch(next)
 }
