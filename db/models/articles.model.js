@@ -8,10 +8,10 @@ function idCheck(id, rows) {
     })
     .then((rows) => {
         if(rows.length !== 0){
-            return {'comments' : []}
+            return Promise.reject('no comments')
         }
         else {
-            return {Error : "ID Does Not Exist"}
+           return Promise.reject('wrong id')
         }
     })
    }

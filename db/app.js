@@ -19,15 +19,17 @@ app.get("/api/articles", getAllArticles)
 
 
 app.use((err, req, res, next) => {
-
     if (err.code === '22P02'){
         res.status(400).send({Error: "400, Bad Request"})
     }
     else if (err.code === '22003'){
         res.status(400).send({Error: "400, Invalid ID"})
     }
-    else {
-        res.status(404).send({Error : "ID Does Not Exist"})
+    else if (err === 'no comments'){
+        res.status(200).send({comments: []})
+    }
+    else if (err === 'wrong id'){
+        res.status(404).send({ Error: 'ID Does Not Exist' })
     }
     next()
 })

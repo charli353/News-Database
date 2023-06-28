@@ -143,7 +143,7 @@ describe("CORE: GET - /api/articles/:article_id", () => {
       .get("/api/articles/4/comments")
       .expect(200)
       .then(({body}) => {
-        expect(body.comments).toEqual({comments: []})
+        expect(body).toEqual({comments: []})
       })
   })
 })
