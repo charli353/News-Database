@@ -104,7 +104,6 @@ describe("CORE: GET - /api/articles/:article_id", () => {
         .get("/api/articles/1/comments")
         .expect(200)
         .then(({ body }) => {
-          console.log(body)
           body.forEach((comment) => {
             expect(comment).toHaveProperty("comment_id", expect.any(Number));
             expect(comment).toHaveProperty("votes", expect.any(Number)); 
