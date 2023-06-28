@@ -1,5 +1,5 @@
 const { error } = require('console')
-const { retrieveArticlesById } = require('../models/articles.model')
+const { retrieveArticlesById, retrieveArticles } = require('../models/articles.model')
 
 
 function getArticleById(req, res, next) {
@@ -16,8 +16,12 @@ function getArticleById(req, res, next) {
         res.status(code).send({articles})
     })
     .catch(next)
-
-
 }
 
-module.exports = { getArticleById }
+function getAllArticles(req, res, next) {
+    retrieveArticles().then((articles) => {
+        res.status(200).send({'articles' : articles})
+    })
+}
+
+module.exports = { getArticleById, getAllArticles }

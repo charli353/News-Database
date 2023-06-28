@@ -3,6 +3,7 @@ const app = require("../db/app");
 const seed = require('../db/seeds/seed')
 const db = require("../db/connection")
 const endPoints = require('../endpoints.json')
+const sorted = require('jest-sorted')
 
 
 
@@ -17,7 +18,13 @@ beforeAll(() => {
     db.end()
   });
 
-
+describe("Invalid URL", () => {
+  test('404: Incorrect url input outputs a useful error', () => {
+    return request(app)
+    .get("/api/fakepath")
+    .expect(404)
+  })
+})
 describe("CORE: GET - /api/topics", () => {
     test("200: Endpoint should contain all topic objects in correct format", () => {
         return request(app)
@@ -31,11 +38,6 @@ describe("CORE: GET - /api/topics", () => {
             });
           });
       });
-      test('404: Incorrect url input outputs a useful error', () => {
-        return request(app)
-        .get("/api/fakepath")
-        .expect(404)
-      })
 })
 
 describe("CORE: GET - /api", () => {
@@ -85,12 +87,47 @@ describe("CORE: GET - /api/articles/:article_id", () => {
         expect(body).toEqual({Error: "400, Invalid ID"})
       })
     })
-    test('400: valid ID that doesnt exist outputs useful error message', () => {
+    test('404: valid ID that doesnt exist outputs useful error message', () => {
       return request(app)
       .get("/api/articles/1000")
-      .expect(400)
+      .expect(404)
       .then(({body}) => {
         expect(body).toEqual({ Error: 'ID Does Not Exist' })
       })
     })
   })
+
+  describe("CORE: GET - /api/articles", () => {
+    test("200: Endpoint should contain all article objects except body", () => {
+        return request(app)
+          .get("/api/articles")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.articles.length).not.toBe(0)
+       
+            body.articles.forEach((article) => {
+              expect(article).toHaveProperty("article_id", expect.any(Number));
+              expect(article).toHaveProperty("title", expect.any(String)); 
+              expect(article).toHaveProperty("topic", expect.any(String)); 
+              expect(article).toHaveProperty("author", expect.any(String)); 
+              expect(article).toHaveProperty("created_at", expect.any(String)); 
+              expect(article).not.toHaveProperty("body"); 
+              expect(article).toHaveProperty("votes", expect.any(Number)); 
+              expect(article).toHaveProperty("article_img_url", expect.any(String))
+              expect(article).toHaveProperty("comment_count", expect.any(Number));; 
+            });
+          });
+      });
+      test("200: Articles are correctly ordered (Descending by Date Created)", () => {
+        return request(app)
+          .get("/api/articles")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.articles.length).not.toBe(0)
+            const dates = body.articles.map((article) => {
+              return article.created_at
+            })        
+            expect(dates).toBeSorted({ descending: true })
+          });
+      });
+    })

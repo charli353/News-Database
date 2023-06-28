@@ -15,4 +15,12 @@ function retrieveArticlesById(id) {
         
     })
 }   
-module.exports = { retrieveArticlesById }
+
+function retrieveArticles() {
+        return db.query(`SELECT COUNT(c.article_id)::int AS comment_count, a.article_id, a.title, a.topic, a.author, a.created_at, a.votes, a.article_img_url FROM articles a, comments c WHERE a.article_id = c.article_id GROUP BY a.article_id ORDER BY a.created_at DESC;`) 
+        .then(({rows}) => {
+            console.log(rows)
+            return rows
+        })
+}
+module.exports = { retrieveArticlesById, retrieveArticles }
