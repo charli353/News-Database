@@ -97,6 +97,57 @@ describe("CORE: GET - /api/articles/:article_id", () => {
     })
   })
 
+
+  describe("CORE: GET /api/articles/:comment_id/comments", () => {
+    test("200: Endpoint should contain all comments about specific article", () => {
+      return request(app)
+        .get("/api/articles/1/comments")
+        .expect(200)
+        .then(({ body }) => {
+          body.comments.forEach((comment) => {
+            expect(comment).toHaveProperty("comment_id", expect.any(Number));
+            expect(comment).toHaveProperty("votes", expect.any(Number)); 
+            expect(comment).toHaveProperty("created_at", expect.any(String)); 
+            expect(comment).toHaveProperty("author", expect.any(String)); 
+            expect(comment).toHaveProperty("body", expect.any(String)); 
+            expect(comment).toHaveProperty("article_id", (1)); 
+          });
+        });
+    });
+    test("200: Endpoint should be ordered by creation date (descending)", () => {
+      return request(app)
+        .get("/api/articles/1/comments")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.comments).toBeSortedBy('created_at', {descending : true})
+          });
+        });
+        test('404: valid ID that doesnt exist outputs useful error message', () => {
+          return request(app)
+          .get("/api/articles/120/comments")
+          .expect(404)
+          .then(({body}) => {
+            expect(body).toEqual({ Error: 'ID Does Not Exist' })
+          })
+        })
+        test('400: Incorrect url parameter input outputs a useful error message', () => {
+          return request(app)
+          .get("/api/articles/dog/comments")
+          .expect(400)
+          .then(({body}) => {
+            expect(body).toEqual({Error: "400, Bad Request"})
+          })
+    })
+    test('200: ID with no comments returns empty array.', () => {
+      return request(app)
+      .get("/api/articles/4/comments")
+      .expect(200)
+      .then(({body}) => {
+        expect(body).toEqual({comments: []})
+      })
+  })
+})
+
   describe("CORE: GET - /api/articles", () => {
     test("200: Endpoint should contain all article objects except body", () => {
         return request(app)
@@ -131,3 +182,4 @@ describe("CORE: GET - /api/articles/:article_id", () => {
           });
       });
     })
+ 
