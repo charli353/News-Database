@@ -10,6 +10,7 @@ const sorted = require('jest-sorted')
 const devData = require('../db/data/test-data/index');
 
 
+
 beforeAll(() => {
     return seed(devData)
   });
@@ -228,7 +229,7 @@ describe("CORE: POST /api/articles/:article_id/comments", () => {
             })
             
   })
-  test('Receive 400 error - Body requires a string input', () => {
+  test('Receive 400 error - Body requires a string input (not NULL)', () => {
     const badInput2 = {username : 'rogersop', body : null }
     return request(app)
         .post("/api/articles/4/comments")
@@ -275,3 +276,81 @@ test('400  -  Incorrect ID input outputs a useful error message', () => {
         });
     })
 })
+
+describe("CORE: PATCH /api/articles/:article_id", () => {
+  beforeEach(() => {
+    return seed(devData)
+ });
+  test("201 : Endpoint displays the updated article with incremented/decremented votes", () => {
+    const input = {inc_votes : -20}
+    return request(app)
+      .patch("/api/articles/4")
+      .send(input)
+      .expect(201)
+      .then(({body}) => {
+          expect(body).toHaveProperty("article_id", (4));
+          expect(body).toHaveProperty("votes", (-20)); 
+          expect(body).toHaveProperty("created_at", expect.any(String));
+          expect(body).toHaveProperty("topic", expect.any(String))
+          expect(body).toHaveProperty("title", expect.any(String)) 
+          expect(body).toHaveProperty("author", expect.any(String)); 
+          expect(body).toHaveProperty("article_img_url", expect.any(String)); 
+        });
+      })
+      test('400: Incorrect url parameter input outputs a useful error message', () => {
+        const input = {inc_votes : 20}
+        return request(app)
+        .patch("/api/articles/dog")
+        .send(input)
+        .expect(400)
+        .then(({body}) => {
+          expect(body).toEqual({Error: "400, Bad Request"})
+        })
+      })
+      test('400: ID outside of data range outputs a useful error message', () => {
+        const input = {inc_votes : 20}
+        return request(app)
+        .patch("/api/articles/8365298364982642")
+        .send(input)
+        .expect(404)
+        .then(({body}) => {
+          expect(body).toEqual({Error: "404, Invalid ID"})
+        })
+      })
+      test('404: valid ID that doesnt exist outputs useful error message', () => {
+        const input = {inc_votes : 20}
+        return request(app)
+        .patch("/api/articles/1000")
+        .send(input)
+        .expect(404)
+        .then(({body}) => {
+          expect(body).toEqual({ Error: 'ID Does Not Exist' })
+        })
+      })
+      test('201  -  Votes object with extra properties is patched and incremented without the extra properties', () => {
+        const inputLong = {inc_votes: 20, newprop : 'delete this' }
+        return request(app)
+            .patch("/api/articles/4")
+            .send(inputLong)
+            .expect(201)
+            .then(({body}) => {
+              expect(body).toHaveProperty("votes", (20)); 
+              expect(body).toHaveProperty("created_at", expect.any(String)); 
+              expect(body).toHaveProperty("author", ('rogersop')); 
+              expect(body).toHaveProperty("topic", expect.any(String)); 
+              expect(body).toHaveProperty("article_img_url", expect.any(String))
+              expect(body).toHaveProperty("article_id", (4)); 
+              expect(body).not.toHaveProperty("newprop"); 
+            });   
+        })
+        test('Receive 400 error - votes requires a number input (wrong input type)', () => {
+          const badInput = {inc_votes : 'nan' }
+          return request(app)
+              .patch("/api/articles/4")
+              .send(badInput)
+              .expect(400)
+              .then(({body}) => {
+                  expect(body).toEqual({Error : '400, Bad Request'})
+              })
+            })
+    })
