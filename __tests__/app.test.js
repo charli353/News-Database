@@ -124,3 +124,63 @@ describe("CORE: GET - /api/articles/:article_id", () => {
         });
         //write error case for 0 results : 404
     });
+
+
+    const input = {username : 'rogersop', body : 'big comment' }
+    const badInput = {username : 'cheeseman', body : 'big comment' }
+    const badInput2 = {username : 'rogersop', body : null }
+
+describe.only("CORE: POST /api/articles/:article_id/comments", () => {
+  test("Endpoint returns the inserted comment with correct properties/values", () => {
+    
+    return request(app)
+      .post("/api/articles/4/comments")
+      .send(input)
+      .expect(201)
+      .then(({body}) => {
+          expect(body).toHaveProperty("comment_id", expect.any(Number));
+          expect(body).toHaveProperty("votes", (0)); 
+          expect(body).toHaveProperty("created_at", expect.any(String)); 
+          expect(body).toHaveProperty("author", ('rogersop')); 
+          expect(body).toHaveProperty("body", ('big comment')); 
+          expect(body).toHaveProperty("article_id", (4)); 
+        });
+      })
+      test('Receive 400 error - User doesnt exist on users table', () => {
+        return request(app)
+            .post("/api/articles/4/comments")
+            .send(badInput)
+            .expect(400)
+            .then(({body}) => {
+                expect(body).toEqual({Error: 'User does not Exist'})
+            })
+            
+  })
+  test('Receive 400 error - Body requires not null value', () => {
+    return request(app)
+        .post("/api/articles/4/comments")
+        .send(badInput2)
+        .expect(400)
+        .then(({body}) => {
+            expect(body).toEqual({Error : 'Collumn requires Not Null value'})
+        })
+})
+test('400: ID outside of data range outputs a useful error message', () => {
+  return request(app)
+  .post("/api/articles/8365298364982642/comments")
+  .send(input)
+  .expect(400)
+  .then(({body}) => {
+    expect(body).toEqual({Error: "400, Invalid ID"})
+  })
+})
+test('400  -  Incorrect url parameter input outputs a useful error message', () => {
+  return request(app)
+      .post("/api/articles/dog/comments")
+      .send(input)
+      .expect(400)
+      .then(({body}) => {
+          expect(body).toEqual({Error: "400, Bad Request"})
+      })
+  })
+})
