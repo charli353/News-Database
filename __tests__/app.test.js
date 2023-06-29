@@ -275,3 +275,24 @@ test('400  -  Incorrect ID input outputs a useful error message', () => {
         });
     })
 })
+
+
+
+
+
+describe.only("CORE: DELETE /api/articles/:comment_id", () => {
+  test("200: Endpoint should contain deleted comment with correct id", () => {
+    return request(app)
+      .delete("/api/comments/1")
+      .expect(200)
+      .then(({body}) => {
+          expect(body).toHaveProperty("comment_id", (1));
+          expect(body).toHaveProperty("votes", expect.any(Number)); 
+          expect(body).toHaveProperty("created_at", expect.any(String)); 
+          expect(body).toHaveProperty("author", expect.any(String)); 
+          expect(body).toHaveProperty("body", expect.any(String)); 
+          expect(body).toHaveProperty("article_id", expect.any(Number)); 
+
+      });
+  })
+})
