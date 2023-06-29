@@ -1,7 +1,8 @@
 const db = require('../connection');
 
-function idCheck(id, rows) {
+function idCheck(id, rows, single) {
     const values = [id]
+
    if (rows.length === 0) {
     return db.query(`SELECT * FROM articles WHERE article_id = $1;`, values).then(({rows}) => {
         return rows
@@ -15,6 +16,9 @@ function idCheck(id, rows) {
         }
     })
    }
+   else if (single === true){
+    return rows[0]
+   }
    else return rows
 }
          
@@ -22,7 +26,7 @@ function retrieveArticlesById(id) {
     const values = [id]
     return db.query(`SELECT * FROM articles WHERE article_id = $1;`, values)
         .then(({rows}) => {
-            return idCheck(id, rows)
+            return idCheck(id, rows, false)
         
     })
 }   
@@ -31,7 +35,7 @@ function retrieveRelevantComments(id) {
     const values = [id]
     return db.query(`SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC;`, values)
         .then(({rows}) => {
-            return idCheck(id, rows)
+            return idCheck(id, rows, false)
         })
 }
 
@@ -41,4 +45,14 @@ function retrieveArticles() {
             return rows
         })
 }
-module.exports = { retrieveArticlesById, retrieveRelevantComments, retrieveArticles }
+
+function selectArticle(id, update) {
+    const insert = []
+    insert.push(update.inc_votes)
+    insert.push(id)
+    return db.query(`UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING *`, insert)
+    .then(({rows}) => {
+            return idCheck(id, rows, true)
+        })
+}
+module.exports = { retrieveArticlesById, retrieveRelevantComments, retrieveArticles, selectArticle }
