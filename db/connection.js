@@ -8,7 +8,7 @@ require('dotenv').config({
   path: `${__dirname}/../.env.${ENV}`,
 });
 
-if (!process.env.PGDATABASE && !process.env.PGDATABASE_URL) {
+if (!process.env.PGDATABASE && !process.env.DATABASE_URL) {
   throw new Error('PGDATABASE or URL not set');
 }
 
@@ -16,7 +16,7 @@ config = {}
 
 if (ENV === 'production'){
   console.log('production')
-  config.connectionString = process.env.PGDATABASE_URL
+  config.connectionString = process.env.DATABASE_URL
   config.max = 2
 }
 
