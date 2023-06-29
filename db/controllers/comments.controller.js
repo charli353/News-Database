@@ -4,9 +4,9 @@ function postCommentWithId(req, res, next) {
     const insert = req.body
     const id = req.params.article_id
 
-    insertComment(insert, id).then(({rows}) => {
+    insertComment(insert, id).then((comment) => {
 
-        res.status(201).send(rows[0])
+        res.status(201).send(comment)
     })
     .catch(next)
 }

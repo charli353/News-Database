@@ -8,10 +8,10 @@ function idCheck(id, rows) {
     })
     .then((rows) => {
         if(rows.length !== 0){
-            return Promise.reject('no comments')
+            return Promise.reject('Error: 200 - No results')
         }
         else {
-           return Promise.reject('wrong id')
+           return Promise.reject('Error: 404 - Not Found')
         }
     })
    }
