@@ -82,9 +82,9 @@ describe("CORE: GET - /api/articles/:article_id", () => {
     test('400: ID outside of data range outputs a useful error message', () => {
       return request(app)
       .get("/api/articles/8365298364982642")
-      .expect(400)
+      .expect(404)
       .then(({body}) => {
-        expect(body).toEqual({Error: "400, Invalid ID"})
+        expect(body).toEqual({Error: "404, Invalid ID"})
       })
     })
     test('404: valid ID that doesnt exist outputs useful error message', () => {
@@ -205,18 +205,30 @@ describe("CORE: POST /api/articles/:article_id/comments", () => {
           expect(body).toHaveProperty("article_id", (4)); 
         });
       })
+      test("200: Comments are correctly ordered (Descending by Date Created)", () => {
+        return request(app)
+          .get("/api/articles/1/comments")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.comments.length).not.toBe(0)
+            const dates = body.comments.map((comment) => {
+              return comment.created_at
+            })        
+            expect(dates).toBeSorted({ descending: true })
+          });
+      });
       test('Receive 400 error - User doesnt exist on users table', () => {
         const badInput = {username : 'cheeseman', body : 'big comment' }
         return request(app)
             .post("/api/articles/4/comments")
             .send(badInput)
-            .expect(400)
+            .expect(404)
             .then(({body}) => {
                 expect(body).toEqual({Error: 'User does not Exist'})
             })
             
   })
-  test('Receive 400 error - Body requires not null value', () => {
+  test('Receive 400 error - Body requires a string input', () => {
     const badInput2 = {username : 'rogersop', body : null }
     return request(app)
         .post("/api/articles/4/comments")
@@ -226,17 +238,17 @@ describe("CORE: POST /api/articles/:article_id/comments", () => {
             expect(body).toEqual({Error : 'Comment requires a text input'})
         })
 })
-test('400: ID outside of data range outputs a useful error message', () => {
+test('404: ID outside of data range outputs a useful error message', () => {
   const input = {username : 'rogersop', body : 'big comment' }
   return request(app)
   .post("/api/articles/8365298364982642/comments")
   .send(input)
-  .expect(400)
+  .expect(404)
   .then(({body}) => {
-    expect(body).toEqual({Error: "400, Invalid ID"})
+    expect(body).toEqual({Error: "404, Invalid ID"})
   })
 })
-test('400  -  Incorrect url parameter input outputs a useful error message', () => {
+test('400  -  Incorrect ID input outputs a useful error message', () => {
   const input = {username : 'rogersop', body : 'big comment' }
   return request(app)
       .post("/api/articles/dog/comments")
