@@ -33,7 +33,7 @@ function updateArticle(req, res, next) {
     const update = req.body
 
         selectArticle(id, update).then((article) => {
-        res.status(201).send(article)
+        res.status(200).send(article)
 
     })
         .catch(next)

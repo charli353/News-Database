@@ -286,7 +286,7 @@ describe("CORE: PATCH /api/articles/:article_id", () => {
     return request(app)
       .patch("/api/articles/4")
       .send(input)
-      .expect(201)
+      .expect(200)
       .then(({body}) => {
           expect(body).toHaveProperty("article_id", (4));
           expect(body).toHaveProperty("votes", (-20)); 
@@ -332,7 +332,7 @@ describe("CORE: PATCH /api/articles/:article_id", () => {
         return request(app)
             .patch("/api/articles/4")
             .send(inputLong)
-            .expect(201)
+            .expect(200)
             .then(({body}) => {
               expect(body).toHaveProperty("votes", (20)); 
               expect(body).toHaveProperty("created_at", expect.any(String)); 
