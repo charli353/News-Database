@@ -8,20 +8,16 @@ function idCheck(id, rows) {
     })
     .then((rows) => {
         if(rows.length !== 0){
-            return Promise.reject('no comments')
+            return Promise.reject('Error: 200 - No results')
         }
         else {
-           return Promise.reject('wrong id')
+           return Promise.reject('Error: 404 - Not Found')
         }
     })
    }
    else return rows
 }
          
-
-      
-
-
 function retrieveArticlesById(id) {
     const values = [id]
     return db.query(`SELECT * FROM articles WHERE article_id = $1;`, values)
