@@ -38,9 +38,9 @@ function insertComment(insert, id) {
 }
 
 function deleteCommentById(id) {
-return db.query(`SELECT * FROM comments WHERE comment_id = 1`)
+    const value = [id]
+return db.query(`DELETE FROM comments WHERE comment_id = $1 RETURNING *`, value)
     .then(({rows}) => {
-        // console.log(rows)
         return idCheck(id, rows, true)
     })
 }

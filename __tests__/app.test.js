@@ -359,19 +359,43 @@ describe("CORE: PATCH /api/articles/:article_id", () => {
 
 
 
-describe.only("CORE: DELETE /api/articles/:comment_id", () => {
+describe("CORE: DELETE /api/articles/:comment_id", () => {
   test("200: Endpoint should contain deleted comment with correct id", () => {
     return request(app)
-      .delete("/api/comments/1")
+      .delete("/api/comments/2")
       .expect(200)
       .then(({body}) => {
-          expect(body).toHaveProperty("comment_id", (1));
-          expect(body).toHaveProperty("votes", expect.any(Number)); 
-          expect(body).toHaveProperty("created_at", expect.any(String)); 
-          expect(body).toHaveProperty("author", expect.any(String)); 
-          expect(body).toHaveProperty("body", expect.any(String)); 
-          expect(body).toHaveProperty("article_id", expect.any(Number)); 
-
+          expect(body.deleted_comment).toHaveProperty("comment_id", (2));
+          expect(body.deleted_comment).toHaveProperty("votes", expect.any(Number)); 
+          expect(body.deleted_comment).toHaveProperty("created_at", expect.any(String)); 
+          expect(body.deleted_comment).toHaveProperty("author", expect.any(String)); 
+          expect(body.deleted_comment).toHaveProperty("body", expect.any(String)); 
+          expect(body.deleted_comment).toHaveProperty("article_id", expect.any(Number)); 
       });
   })
+  test('400: Incorrect url parameter input outputs a useful error message', () => {
+    return request(app)
+    .delete("/api/comments/dog")
+    .expect(400)
+    .then(({body}) => {
+      expect(body).toEqual({Error: "400, Bad Request"})
+    })
+  })
+  test('400: ID outside of data range outputs a useful error message', () => {
+    return request(app)
+    .delete("/api/comments/8365298364982642")
+    .expect(404)
+    .then(({body}) => {
+      expect(body).toEqual({Error: "404, Invalid ID"})
+    })
+  })
+  test('404: valid ID that doesnt exist outputs useful error message', () => {
+    return request(app)
+    .delete("/api/comments/1000")
+    .expect(404)
+    .then(({body}) => {
+      expect(body).toEqual({ Error: 'ID Does Not Exist' })
+    })
+  })
+
 })

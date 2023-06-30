@@ -6,7 +6,7 @@ const { getAllTopics, getEndpoints } = require('../db/controllers/topics.control
 const { getArticleById, getCommentByArticleId, getAllArticles, updateArticle } = require('../db/controllers/articles.controller')
 const { postCommentWithId, deleteComment } = require('../db/controllers/comments.controller')
 const errorHandler = require('./error-handler')
-const { appendFile } = require('fs')
+
 
 
 const app = express()
@@ -27,9 +27,6 @@ app.get("/api/articles", getAllArticles)
 
 app.patch("/api/articles/:article_id", updateArticle)
 
-
-
-app.delete("/api/comments/:comment_id", deleteComment)
 
 
 app.delete("/api/comments/:comment_id", deleteComment)
