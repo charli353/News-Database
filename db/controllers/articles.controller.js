@@ -13,9 +13,12 @@ function getArticleById(req, res, next) {
 }
 
 function getAllArticles(req, res, next) {
-    retrieveArticles().then((articles) => {
+    const query = req.query
+    retrieveArticles(query).then((articles) => {
+
         res.status(200).send({'articles' : articles})
     })
+    .catch(next)
 }
 
 function getCommentByArticleId(req, res, next) {

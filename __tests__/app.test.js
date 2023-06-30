@@ -54,7 +54,7 @@ describe("CORE: GET - /api", () => {
 })
 
 describe("CORE: GET - /api/articles/:article_id", () => {
-  test("200: Endpoint should contain all article objects in with correct ID", () => {
+  test("200: Endpoint should contain article object with correct ID and comment count", () => {
       return request(app)
         .get("/api/articles/5")
         .expect(200)
@@ -69,6 +69,8 @@ describe("CORE: GET - /api/articles/:article_id", () => {
             expect(article).toHaveProperty("created_at", expect.any(String)); 
             expect(article).toHaveProperty("votes", expect.any(Number)); 
             expect(article).toHaveProperty("article_img_url", expect.any(String)); 
+            expect(article).toHaveProperty("comment_count", expect.any(Number)); 
+
           });
         });
     });
@@ -144,13 +146,14 @@ describe("CORE: GET - /api/articles/:article_id", () => {
       .get("/api/articles/4/comments")
       .expect(200)
       .then(({body}) => {
+   
         expect(body).toEqual({comments: []})
       })
   })
 })
 
   describe("CORE: GET - /api/articles", () => {
-    test("200: Endpoint should contain all article objects except body", () => {
+    test("200: Endpoint should contain all article objects except body when query is absent", () => {
         return request(app)
           .get("/api/articles")
           .expect(200)
@@ -170,7 +173,7 @@ describe("CORE: GET - /api/articles/:article_id", () => {
             });
           });
       });
-      test("200: Articles are correctly ordered (Descending by Date Created)", () => {
+      test("200: Articles are correctly ordered by default : no query - (Descending by Date Created)", () => {
         return request(app)
           .get("/api/articles")
           .expect(200)
@@ -182,6 +185,78 @@ describe("CORE: GET - /api/articles/:article_id", () => {
             expect(dates).toBeSorted({ descending: true })
           });
       });
+      test("200: Topic query within endpoint returns articles filtered by specific topic", () => {
+        return request(app)
+          .get("/api/articles?topic=mitch")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.articles.length).not.toBe(0)
+            body.articles.forEach((article) => {
+                expect(article).toHaveProperty("topic", ('mitch'))
+            })        
+          });
+      });
+      test("400: Invalid topic query within endpoint returns useful error", () => {
+        return request(app)
+          .get("/api/articles?topic=faketopic")
+          .expect(404)
+          .then(({ body }) => {
+            expect(body).toEqual({Error: 'Topic does not exist'})
+          });
+      });
+      test("200: Sort_by query within endpoint returns articles sorted by specific column in default order", () => {
+        return request(app)
+          .get("/api/articles?sort_by=article_id")
+          .expect(200)
+          .then(({ body }) => {
+          
+            expect(body.articles.length).not.toBe(0)
+            const ids = body.articles.map((id) => {
+              return id.article_id
+            })        
+            expect(ids).toBeSorted({ descending: true })
+          })
+        })
+        test("404: Invalid sort by query within endpoint returns useful error", () => {
+          return request(app)
+            .get("/api/articles?sort_by=not_a_column")
+            .expect(404)
+            .then(({ body }) => {
+           
+              expect(body).toEqual({Error: 'Column Not Found'})
+            
+            });
+        });
+        test("200: Sort by query followed by an order query modifies the sort order", () => {
+          return request(app)
+            .get("/api/articles?sort_by=article_id&order=ASC")
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.articles.length).not.toBe(0)
+              const ids = body.articles.map((id) => {
+                return id.article_id
+              })        
+              expect(ids).toBeSorted({ ascending: true })
+            });
+        });
+        test("400: Invalid Order query returns useful error", () => {
+          return request(app)
+            .get("/api/articles?sort_by=article_id&order=FAKEORDER")
+            .expect(400)
+            .then(({ body }) => {
+              expect(body).toEqual({Error: 'Invalid Order Type'})
+   
+            });
+        });
+        test("400: Invalid topic query within endpoint returns useful error", () => {
+          return request(app)
+            .get("/api/articles?topic=paper")
+            .expect(404)
+            .then(({ body }) => {
+
+              expect(body).toEqual({Error: 'Article does not exist'})
+            });
+        });
     })
  
 
