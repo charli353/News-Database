@@ -1,4 +1,4 @@
-const { insertComment } = require('../models/comments.model')
+const { insertComment, deleteCommentById } = require('../models/comments.model')
 
 function postCommentWithId(req, res, next) {
     const insert = req.body
@@ -11,4 +11,13 @@ function postCommentWithId(req, res, next) {
     .catch(next)
 }
 
-module.exports = { postCommentWithId }
+function deleteComment(req, res, next) {
+    const id = req.params.comment_id
+    deleteCommentById(id).then((comment) => {
+        res.status(204).send()
+
+})
+    .catch(next)
+}
+
+module.exports = { postCommentWithId, deleteComment }
