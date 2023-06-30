@@ -391,3 +391,23 @@ describe("CORE: DELETE /api/comments/:comment_id", () => {
   })
 
 })
+
+
+
+
+
+    describe("CORE: GET - /api/users", () => {
+    test("200: Endpoint should contain all user objects in correct format", () => {
+        return request(app)
+          .get("/api/users")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.users.length).not.toBe(0)
+            body.users.forEach((obj) => {
+              expect(obj).toHaveProperty("username", expect.any(String));
+              expect(obj).toHaveProperty("name", expect.any(String)); 
+              expect(obj).toHaveProperty("avatar_url", expect.any(String));
+            });
+          });
+      });
+})
