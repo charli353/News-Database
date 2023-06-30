@@ -248,6 +248,15 @@ describe("CORE: GET - /api/articles/:article_id", () => {
    
             });
         });
+        test("400: Invalid topic query within endpoint returns useful error", () => {
+          return request(app)
+            .get("/api/articles?topic=paper")
+            .expect(404)
+            .then(({ body }) => {
+
+              expect(body).toEqual({Error: 'Article does not exist'})
+            });
+        });
     })
  
 

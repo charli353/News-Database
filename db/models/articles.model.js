@@ -58,7 +58,6 @@ function retrieveArticles(query) {
                     return queryCheck(query, rows, key)
                 })
         }
-
     }
     else if (Object.keys(query)[1] === 'order' && Object.keys(query)[0] === 'sort_by'){
         baseQuery += ` ORDER BY a.${query.sort_by} ${query.order};`
