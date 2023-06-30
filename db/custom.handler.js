@@ -24,12 +24,15 @@ function idCheck(id, rows, single) {
 }
 
 function queryCheck(query, rows, key) {
+  
     const qArr = []
     qArr.push(key)
     qArr.push(Object.values(query)[0])
 
-   if (rows.length === 0) {
+    const validQueries = ['article_id', 'title', 'author', 'created_at', 'votes', 'topic', 'article_img_url']
 
+   if (rows.length === 0 || (validQueries.includes(Object.values(query)[0]) === false && query === {})) {
+  
     return Promise.reject('Error: 200 - No Articles')
     }
         else return rows

@@ -1,5 +1,6 @@
 
 function errorHandler(err, req, res, next) {
+
     if (err.code === '22P02'){
         res.status(400).send({Error: "400, Bad Request"})
     }
@@ -19,7 +20,13 @@ function errorHandler(err, req, res, next) {
         res.status(404).send({ Error: 'ID Does Not Exist' })
     }
     else if (err === 'Error: 200 - No Articles'){
-        res.status(200).send({articles: []})
+        res.status(404).send({Error: 'Topic does not exist'})
+    }
+    else if (err.code === '42601'){
+        res.status(400).send({Error: 'Invalid Order Type'})
+    }
+    else if (err.code === '42703'){
+        res.status(404).send({Error: 'Column Not Found'})
     }
     next()
 }
