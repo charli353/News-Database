@@ -14,7 +14,7 @@ function postCommentWithId(req, res, next) {
 function deleteComment(req, res, next) {
     const id = req.params.comment_id
     deleteCommentById(id).then((comment) => {
-        res.status(200).send({"deleted_comment" :comment})
+        res.status(204).send()
 
 })
     .catch(next)

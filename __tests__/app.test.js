@@ -359,19 +359,11 @@ describe("CORE: PATCH /api/articles/:article_id", () => {
 
 
 
-describe("CORE: DELETE /api/articles/:comment_id", () => {
+describe("CORE: DELETE /api/comments/:comment_id", () => {
   test("200: Endpoint should contain deleted comment with correct id", () => {
     return request(app)
       .delete("/api/comments/2")
-      .expect(200)
-      .then(({body}) => {
-          expect(body.deleted_comment).toHaveProperty("comment_id", (2));
-          expect(body.deleted_comment).toHaveProperty("votes", expect.any(Number)); 
-          expect(body.deleted_comment).toHaveProperty("created_at", expect.any(String)); 
-          expect(body.deleted_comment).toHaveProperty("author", expect.any(String)); 
-          expect(body.deleted_comment).toHaveProperty("body", expect.any(String)); 
-          expect(body.deleted_comment).toHaveProperty("article_id", expect.any(Number)); 
-      });
+      .expect(204)
   })
   test('400: Incorrect url parameter input outputs a useful error message', () => {
     return request(app)
