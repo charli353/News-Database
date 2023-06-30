@@ -389,3 +389,60 @@ describe("CORE: PATCH /api/articles/:article_id", () => {
               })
             })
     })
+
+
+
+
+
+describe("CORE: DELETE /api/comments/:comment_id", () => {
+  test("200: Endpoint should contain deleted comment with correct id", () => {
+    return request(app)
+      .delete("/api/comments/2")
+      .expect(204)
+  })
+  test('400: Incorrect url parameter input outputs a useful error message', () => {
+    return request(app)
+    .delete("/api/comments/dog")
+    .expect(400)
+    .then(({body}) => {
+      expect(body).toEqual({Error: "400, Bad Request"})
+    })
+  })
+  test('400: ID outside of data range outputs a useful error message', () => {
+    return request(app)
+    .delete("/api/comments/8365298364982642")
+    .expect(404)
+    .then(({body}) => {
+      expect(body).toEqual({Error: "404, Invalid ID"})
+    })
+  })
+  test('404: valid ID that doesnt exist outputs useful error message', () => {
+    return request(app)
+    .delete("/api/comments/1000")
+    .expect(404)
+    .then(({body}) => {
+      expect(body).toEqual({ Error: 'ID Does Not Exist' })
+    })
+  })
+
+})
+
+
+
+
+
+    describe("CORE: GET - /api/users", () => {
+    test("200: Endpoint should contain all user objects in correct format", () => {
+        return request(app)
+          .get("/api/users")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.users.length).not.toBe(0)
+            body.users.forEach((obj) => {
+              expect(obj).toHaveProperty("username", expect.any(String));
+              expect(obj).toHaveProperty("name", expect.any(String)); 
+              expect(obj).toHaveProperty("avatar_url", expect.any(String));
+            });
+          });
+      });
+})

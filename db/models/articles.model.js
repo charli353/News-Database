@@ -35,7 +35,10 @@ function retrieveArticles(query) {
     //if query is null or undefined (original query)
     if (Object.keys(query).length === 0) {
 
-        return db.query(`SELECT COUNT(c.article_id)::int AS comment_count, a.article_id, a.title, a.topic, a.author, a.created_at, a.votes, a.article_img_url FROM articles a, comments c WHERE a.article_id = c.article_id GROUP BY a.article_id ORDER BY a.created_at DESC;`) 
+        return db.query(`SELECT a.article_id, a.title, a.topic, a.author, a.created_at, a.votes, a.article_img_url, COUNT(comments.article_id)::int AS comment_count
+        FROM articles a
+        LEFT JOIN comments ON a.article_id = comments.article_id
+        GROUP BY a.article_id ORDER BY a.created_at DESC;`)
         .then(({rows}) => {
           
             return rows
