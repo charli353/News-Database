@@ -4,9 +4,10 @@ const fs = require('fs/promises')
 
 const { getAllTopics, getEndpoints } = require('../db/controllers/topics.controller')
 const { getArticleById, getCommentByArticleId, getAllArticles, updateArticle } = require('../db/controllers/articles.controller')
-const { postCommentWithId } = require('../db/controllers/comments.controller')
+const { postCommentWithId, deleteComment } = require('../db/controllers/comments.controller')
 const { getAllUsers } = require('../db/controllers/users.controller')
 const errorHandler = require('./error-handler')
+
 
 
 const app = express()
@@ -27,6 +28,9 @@ app.get("/api/articles", getAllArticles)
 
 app.patch("/api/articles/:article_id", updateArticle)
 
+
+
+app.delete("/api/comments/:comment_id", deleteComment)
 
 
 app.get("/api/users", getAllUsers)
