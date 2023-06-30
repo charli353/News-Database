@@ -192,10 +192,9 @@ describe("CORE: GET - /api/articles/:article_id", () => {
             body.articles.forEach((article) => {
                 expect(article).toHaveProperty("topic", ('mitch'))
             })        
-      
           });
       });
-      test("200: Invalid topic query within endpoint returns hmmmm", () => {
+      test("200: Invalid topic query within endpoint returns empty array", () => {
         return request(app)
           .get("/api/articles?topic=faketopic")
           .expect(200)
@@ -203,20 +202,56 @@ describe("CORE: GET - /api/articles/:article_id", () => {
             expect(body).toEqual({articles: []})
           });
       });
-      // test("200: Sort_by query within endpoint returns articles sorted by specific column", () => {
-      //   return request(app)
-      //     .get("/api/articles?sort_by=article_id")
-      //     .expect(200)
-      //     .then(({ body }) => {
-      //       console.log(body)
-      //       expect(body.articles.length).not.toBe(0)
-      //       const ids = body.articles.map((id) => {
-      //         return id.article_id
-      //       })        
-      //       expect(ids).toBeSorted({ descending: true })
+      test("200: Sort_by query within endpoint returns articles sorted by specific column in default order", () => {
+        return request(app)
+          .get("/api/articles?sort_by=article_id")
+          .expect(200)
+          .then(({ body }) => {
+          
+            expect(body.articles.length).not.toBe(0)
+            const ids = body.articles.map((id) => {
+              return id.article_id
+            })        
+            expect(ids).toBeSorted({ descending: true })
+          })
+        })
+        test("200: Invalid sort by query within endpoint returns default sort (DESC BY DATE)", () => {
+          return request(app)
+            .get("/api/articles?sort_by=not_a_column")
+            .expect(200)
+            .then(({ body }) => {
       
-      //     })
-      //   })
+              expect(body.articles.length).not.toBe(0)
+              const dates = body.articles.map((article) => {
+                return article.created_at
+              })        
+              expect(dates).toBeSorted({ descending: true })
+            });
+        });
+        test("200: Sort by query followed by an order query modifies the sort order", () => {
+          return request(app)
+            .get("/api/articles?sort_by=article_id&order=ASC")
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.articles.length).not.toBe(0)
+              const ids = body.articles.map((id) => {
+                return id.article_id
+              })        
+              expect(ids).toBeSorted({ ascending: true })
+            });
+        });
+        test("200: Invalid Order query returns articles in default order", () => {
+          return request(app)
+            .get("/api/articles?sort_by=article_id&order=FAKEORDER")
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.articles.length).not.toBe(0)
+              const ids = body.articles.map((id) => {
+                return id.article_id
+              })        
+              expect(ids).toBeSorted({ descending: true })
+            });
+        });
     })
  
 

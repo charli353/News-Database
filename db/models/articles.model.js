@@ -23,51 +23,61 @@ function retrieveRelevantComments(id) {
 }
 
 function retrieveArticles(query) {
-   
-    
     const qArr = []
     const key = Object.keys(query)[0]
     qArr.push(key)
     qArr.push(Object.values(query)[0])
-
-    let baseQuery
     
-    //if query is null or undefined (original query)
-    if (Object.keys(query).length === 0) {
+    let baseQuery
+    const validQueries = ['article_id', 'title', 'author', 'created_at', 'votes', 'topic', 'article_img_url']
+    
 
+    if (Object.keys(query).length === 1 || Object.keys(query).length === 0){
+        if (Object.keys(query).length === 0 || (validQueries.includes(query[key]) === false && key === 'sort_by')) {
+
+            return db.query(`SELECT a.article_id, a.title, a.topic, a.author, a.created_at, a.votes, a.article_img_url, COUNT(comments.article_id)::int AS comment_count
+            FROM articles a
+            LEFT JOIN comments ON a.article_id = comments.article_id
+            GROUP BY a.article_id ORDER BY a.created_at DESC;`)
+            .then(({rows}) => {
+              
+                return rows
+            })
+        }
+        else if (qArr[0] === 'sort_by' && validQueries.includes(query[key]) === true ){
+            return db.query(`SELECT a.article_id, a.title, a.topic, a.author, a.created_at, a.votes, a.article_img_url, COUNT(comments.article_id)::int AS comment_count
+            FROM articles a
+            LEFT JOIN comments ON a.article_id = comments.article_id
+            GROUP BY a.article_id ORDER BY a.${qArr[1]} DESC;`)
+                .then(({rows}) => {
+                    return queryCheck(query, rows, key)
+                })
+        }
+    
+
+        else if(qArr[0] === 'topic'){
+            
+            baseQuery = `SELECT * FROM articles WHERE topic = $1;`
+            return db.query(baseQuery, [qArr[1]])
+                .then(({rows}) => {
+                   
+                    return queryCheck(query, rows, key)
+                })
+        }
+
+    }
+    else if (Object.keys(query)[1] === 'order' && Object.keys(query)[0] === 'sort_by'){
+        if (query.order !== 'ASC' && query.order !== 'DESC'){
+            query.order = 'DESC'
+        }
         return db.query(`SELECT a.article_id, a.title, a.topic, a.author, a.created_at, a.votes, a.article_img_url, COUNT(comments.article_id)::int AS comment_count
         FROM articles a
         LEFT JOIN comments ON a.article_id = comments.article_id
-        GROUP BY a.article_id ORDER BY a.created_at DESC;`)
-        .then(({rows}) => {
-          
-            return rows
-        })
-    }
-    //sort_by sorts by specific column default is date
-    else if (qArr[0] === 'sort_by'){
-
-        baseQuery = `SELECT COUNT(c.article_id)::int AS comment_count, a.article_id, a.title, a.topic, a.author, a.created_at, a.votes, a.article_img_url FROM articles a, comments c WHERE a.article_id = c.article_id GROUP BY a.article_id ORDER BY $1 DESC;`
-        return db.query(baseQuery, [qArr[1]])
+        GROUP BY a.article_id ORDER BY a.${query.sort_by} ${query.order};`)
             .then(({rows}) => {
-      
                 return queryCheck(query, rows, key)
             })
     }
-
-    //topic query filters for topics
-    else if(qArr[0] === 'topic'){
-        
-        baseQuery = `SELECT * FROM articles WHERE topic = $1;`
-        return db.query(baseQuery, [qArr[1]])
-            .then(({rows}) => {
-               
-                return queryCheck(query, rows, key)
-            })
-    }
-    
-    //order sets 
-
 }
 
 function selectArticle(id, update) {
