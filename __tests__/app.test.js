@@ -144,13 +144,14 @@ describe("CORE: GET - /api/articles/:article_id", () => {
       .get("/api/articles/4/comments")
       .expect(200)
       .then(({body}) => {
+   
         expect(body).toEqual({comments: []})
       })
   })
 })
 
   describe("CORE: GET - /api/articles", () => {
-    test("200: Endpoint should contain all article objects except body", () => {
+    test("200: Endpoint should contain all article objects except body when query is absent", () => {
         return request(app)
           .get("/api/articles")
           .expect(200)
@@ -170,7 +171,7 @@ describe("CORE: GET - /api/articles/:article_id", () => {
             });
           });
       });
-      test("200: Articles are correctly ordered (Descending by Date Created)", () => {
+      test("200: Articles are correctly ordered by default : no query - (Descending by Date Created)", () => {
         return request(app)
           .get("/api/articles")
           .expect(200)
@@ -182,6 +183,40 @@ describe("CORE: GET - /api/articles/:article_id", () => {
             expect(dates).toBeSorted({ descending: true })
           });
       });
+      test("200: Topic query within endpoint returns articles filtered by specific topic", () => {
+        return request(app)
+          .get("/api/articles?topic=mitch")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.articles.length).not.toBe(0)
+            body.articles.forEach((article) => {
+                expect(article).toHaveProperty("topic", ('mitch'))
+            })        
+      
+          });
+      });
+      test("200: Invalid topic query within endpoint returns hmmmm", () => {
+        return request(app)
+          .get("/api/articles?topic=faketopic")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body).toEqual({articles: []})
+          });
+      });
+      // test("200: Sort_by query within endpoint returns articles sorted by specific column", () => {
+      //   return request(app)
+      //     .get("/api/articles?sort_by=article_id")
+      //     .expect(200)
+      //     .then(({ body }) => {
+      //       console.log(body)
+      //       expect(body.articles.length).not.toBe(0)
+      //       const ids = body.articles.map((id) => {
+      //         return id.article_id
+      //       })        
+      //       expect(ids).toBeSorted({ descending: true })
+      
+      //     })
+      //   })
     })
  
 
