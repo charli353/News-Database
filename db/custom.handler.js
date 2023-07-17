@@ -42,4 +42,27 @@ function queryCheck(query, rows, key) {
         else return rows
 }
 
-module.exports = { idCheck, queryCheck }
+function userCheck(username, rows, single) {
+    const values = [username]
+
+   if (rows.length === 0) {
+    return db.query(`SELECT * FROM users WHERE username = $1;`, values).then(({rows}) => {
+        return rows
+    })
+    .then((rows) => {
+        if(rows.length !== 0){
+            return Promise.reject('Error: 200 - No results')
+        }
+        else {
+
+           return Promise.reject('Error: 404 - Not Found')
+        }
+    })
+   }
+   else if (single === true){
+    return rows[0]
+   }
+   else return rows
+}
+
+module.exports = { idCheck, queryCheck, userCheck }

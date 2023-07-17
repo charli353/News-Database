@@ -486,3 +486,26 @@ describe("CORE: DELETE /api/comments/:comment_id", () => {
           });
       });
 })
+
+describe("CORE: GET - /api/users/:username", () => {
+  test("200: Endpoint should contain correct user object", () => {
+      return request(app)
+        .get("/api/users/icellusedkars")
+        .expect(200)
+        .then(({ body }) => {
+        const user = body.user
+            expect(user).toHaveProperty("username", ("icellusedkars"));
+            expect(user).toHaveProperty("name", ('sam')); 
+            expect(user).toHaveProperty("avatar_url", ('https://avatars2.githubusercontent.com/u/24604688?s=460&v=4'));
+          });
+        });
+        test('404: Incorrect url parameter input outputs a useful error message', () => {
+          return request(app)
+          .get("/api/users/12")
+          .expect(404)
+          .then(({body}) => {
+            expect(body).toEqual({ Error: 'ID Does Not Exist' })
+          })
+        })
+      })
+
