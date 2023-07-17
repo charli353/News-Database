@@ -42,4 +42,13 @@ function updateArticle(req, res, next) {
         .catch(next)
 }
 
+// function postArticle(req, res, next) {
+//     const article = req.body
+//     console.log(article, 'in controller')
+//     addArticle(article).then((article) => {
+//         req.status(204).send(articles)
+//     })
+//     .catch(next)
+// }
+
 module.exports = { getArticleById, getCommentByArticleId, getAllArticles, updateArticle }

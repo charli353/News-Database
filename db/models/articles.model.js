@@ -77,4 +77,11 @@ function selectArticle(id, update) {
             return idCheck(id, rows, true)
         })
 }
+
+// function addArticle(article) {
+//     const insert = []
+
+//     return db.query(`INSERT INTO articles(title, topic, author, aritcle_img_url)
+//     VALUES (value1, value2, …);`)
+// }
 module.exports = { retrieveArticlesById, retrieveRelevantComments, retrieveArticles, selectArticle }
