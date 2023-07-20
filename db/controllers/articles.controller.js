@@ -1,5 +1,5 @@
 
-const { retrieveArticlesById, retrieveRelevantComments, retrieveArticles, selectArticle } = require('../models/articles.model')
+const { retrieveArticlesById, retrieveRelevantComments, retrieveArticles, selectArticle, addArticle } = require('../models/articles.model')
 
 
 
@@ -42,13 +42,14 @@ function updateArticle(req, res, next) {
         .catch(next)
 }
 
-// function postArticle(req, res, next) {
-//     const article = req.body
-//     console.log(article, 'in controller')
-//     addArticle(article).then((article) => {
-//         req.status(204).send(articles)
-//     })
-//     .catch(next)
-// }
+function postArticle(req, res, next) {
+    const article = req.body
 
-module.exports = { getArticleById, getCommentByArticleId, getAllArticles, updateArticle }
+    addArticle(article).then((response) => {
+        console.log(response)
+        res.status(201).send(response)
+    })
+    .catch(next)
+}
+
+module.exports = { getArticleById, getCommentByArticleId, getAllArticles, updateArticle, postArticle }

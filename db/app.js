@@ -37,7 +37,7 @@ app.get("/api/users", getAllUsers)
 
 app.get("/api/users/:username", getUser)
 
-// app.post("/api/articles", postArticle)
+app.post("/api/articles", postArticle)
 
 app.use(errorHandler)
 

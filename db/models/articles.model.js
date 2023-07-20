@@ -46,11 +46,21 @@ function retrieveArticles(query) {
             })
         }
         else if (qArr[0] === 'sort_by'){
+            if(qArr[1] === 'comment_count'){
+                baseQuery += ` ORDER BY ${qArr[1]} DESC;`
+                return db.query(baseQuery)
+                    .then(({rows}) => {
+                        return queryCheck(query, rows, key)
+                    })
+            }
+           else {
             baseQuery += ` ORDER BY a.${qArr[1]} DESC;`
             return db.query(baseQuery)
                 .then(({rows}) => {
                     return queryCheck(query, rows, key)
                 })
+           }
+            
         }
         else if(qArr[0] === 'topic'){
             return db.query(`SELECT * FROM articles WHERE topic = $1;`, [qArr[1]])
@@ -60,11 +70,21 @@ function retrieveArticles(query) {
         }
     }
     else if (Object.keys(query)[1] === 'order' && Object.keys(query)[0] === 'sort_by'){
+        if(qArr[1] === 'comment_count'){
+            baseQuery += ` ORDER BY ${query.sort_by} ${query.order};`
+        return db.query(baseQuery)
+            .then(({rows}) => {
+                return queryCheck(query, rows, key)
+            })
+        }
+    else {
         baseQuery += ` ORDER BY a.${query.sort_by} ${query.order};`
         return db.query(baseQuery)
             .then(({rows}) => {
                 return queryCheck(query, rows, key)
             })
+    }
+
     }
 }
 
@@ -78,10 +98,13 @@ function selectArticle(id, update) {
         })
 }
 
-// function addArticle(article) {
-//     const insert = []
-
-//     return db.query(`INSERT INTO articles(title, topic, author, aritcle_img_url)
-//     VALUES (value1, value2, …);`)
-// }
-module.exports = { retrieveArticlesById, retrieveRelevantComments, retrieveArticles, selectArticle }
+function addArticle(article) {
+    const values = Object.values(article)
+    console.log(values)
+        return db.query(`INSERT INTO articles(title, topic, author, body, article_img_url)
+    VALUES($1, $2, $3, $4, $5) RETURNING *;`, values).then(({rows}) => {
+        
+        return rows[0]
+    })
+}
+module.exports = { retrieveArticlesById, retrieveRelevantComments, retrieveArticles, selectArticle, addArticle }

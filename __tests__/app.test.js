@@ -219,10 +219,9 @@ describe("CORE: GET - /api/articles/:article_id", () => {
         })
         test("404: Invalid sort by query within endpoint returns useful error", () => {
           return request(app)
-            .get("/api/articles?sort_by=not_a_column")
+            .get("/api/articles?sort_by=fakecolumn")
             .expect(404)
             .then(({ body }) => {
-           
               expect(body).toEqual({Error: 'Column Not Found'})
             
             });
@@ -237,6 +236,18 @@ describe("CORE: GET - /api/articles/:article_id", () => {
                 return id.article_id
               })        
               expect(ids).toBeSorted({ ascending: true })
+            });
+        });
+        test("200: Sort by query followed by an order query modifies the sort order", () => {
+          return request(app)
+            .get("/api/articles?sort_by=comment_count&order=ASC")
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.articles.length).not.toBe(0)
+              const comments = body.articles.map((comment) => {
+                return comment.comment_count
+              })        
+              expect(comments).toBeSorted({ ascending: true })
             });
         });
         test("400: Invalid Order query returns useful error", () => {
@@ -509,3 +520,43 @@ describe("CORE: GET - /api/users/:username", () => {
         })
       })
 
+      describe("CORE: POST /api/articles/", () => {
+        test("201 : Endpoint displays the inserted article with correct properties/values", () => {
+          const input = {title : 'newartcile', topic : 'cats', author : 'rogersop', body : 'hugebody', article_img_url : 'fakelink' }
+          return request(app)
+            .post("/api/articles")
+            .send(input)
+            .expect(201)
+            .then(({body}) => {
+
+                expect(body).toHaveProperty("votes", (0)); 
+                expect(body).toHaveProperty("created_at", expect.any(String)); 
+                expect(body).toHaveProperty("title", expect.any(String));
+                expect(body).toHaveProperty("author", ('rogersop')); 
+                expect(body).toHaveProperty("body", ('hugebody')); 
+                expect(body).toHaveProperty("article_id", expect.any(Number)); 
+              });
+            })
+            test('Receive 400 error - User doesnt exist on users table', () => {
+              const badInput = {title : 'newartcile', topic : 'cats', author : 'fakeman', body : 'hugebody', article_img_url : 'fakelink' }
+              return request(app)
+                  .post("/api/articles")
+                  .send(badInput)
+                  .expect(404)
+                  .then(({body}) => {
+                      expect(body).toEqual({Error: 'User does not Exist'})
+                  })
+                  
+        })
+        test('Receive 400 error - Body requires a string input (not NULL)', () => {
+          const badInput2 = {title : 'newartcile', topic : 'cats', author : 'rogersop', body : null, article_img_url : 'fakelink' }
+          return request(app)
+              .post("/api/articles")
+              .send(badInput2)
+              .expect(400)
+              .then(({body}) => {
+                  expect(body).toEqual({Error : 'Comment requires a text input'})
+              })
+      })
+          })
+          
